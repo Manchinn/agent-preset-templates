@@ -60,10 +60,11 @@ function Find-ShippedRoot {
             $dir = Split-Path $dir
         }
     }
-    $nvmRoots = @(
-        (Join-Path $env:APPDATA 'nvm'),
-        (Join-Path ([Environment]::GetFolderPath('UserProfile')) 'AppData\Roaming\nvm')
-    ) | Select-Object -Unique | Where-Object { Test-Path $_ }
+    $nvmRoots = @()
+    foreach ($nvmBase in @($env:APPDATA, ([Environment]::GetFolderPath('UserProfile')))) {
+        if ($nvmBase) { $nvmRoots += (Join-Path $nvmBase 'nvm') }
+    }
+    $nvmRoots = $nvmRoots | Select-Object -Unique | Where-Object { Test-Path $_ }
     foreach ($nvm in $nvmRoots) {
         $hit = Get-ChildItem $nvm -Directory -ErrorAction SilentlyContinue |
             ForEach-Object { Join-Path $_.FullName 'node_modules\@deepseek-ai\dsh\config\agent-presets' } |
@@ -72,7 +73,8 @@ function Find-ShippedRoot {
     }
     return $null
 }
-$script:ShippedRoot = Find-ShippedRoot
+$script:ShippedRoot = $null
+if (-not $BaseDir) { $script:ShippedRoot = Find-ShippedRoot }
 
 # ── validation ───────────────────────────────────────────────────────────────
 
