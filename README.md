@@ -80,6 +80,15 @@ cd agent-preset-templates
 
 ---
 
+## Contribution
+
+ยินดีรับ PR! วิธีเพิ่ม persona, กติกาการแก้โค้ด และ flow ของ PR อยู่ใน:
+
+- [CONTRIBUTING.md](CONTRIBUTING.md)
+- [CHANGELOG.md](CHANGELOG.md)
+
+---
+
 ## โครงสร้าง
 
 ```
