@@ -27,7 +27,7 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$Id,
     [string]$From = 'standard',
-    [string]$PersonaFile = 'personas\thai-coder.md',
+    [string]$PersonaFile = 'personas/thai-coder.md',
     [string]$Name,
     [string]$Description,
     [switch]$Default,

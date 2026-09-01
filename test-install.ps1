@@ -34,7 +34,7 @@ try {
     $tmp = Join-Path $env:TEMP ('dsh-preset-test-' + [guid]::NewGuid().ToString('N'))
     try {
         # ── synthetic base preset (same row shape as `standard`) ────────────
-        $base = Join-Path $tmp 'base\standard'
+        $base = Join-Path $tmp 'base' 'standard'
         New-Item $base -ItemType Directory -Force | Out-Null
         $baseComp = @'
 # synthetic base for install.ps1 self-test
@@ -55,7 +55,7 @@ try {
         [IO.File]::WriteAllText((Join-Path $base 'agent.cordis.yml'), $baseComp.TrimStart() + "`n", [Text.UTF8Encoding]::new($false))
 
         $tmpHome = Join-Path $tmp 'home'
-        $personaFile = Join-Path $script:PSScriptRoot 'personas\thai-coder.md'
+        $personaFile = Join-Path $script:PSScriptRoot 'personas' 'thai-coder.md'
         Assert (Test-Path $personaFile) "persona fixture missing: $personaFile"
         $personaText = (Get-Content $personaFile -Raw -Encoding UTF8).TrimEnd()
 
@@ -65,7 +65,7 @@ try {
         & $install -Id thai-coder -BaseDir $base -PersonaFile $personaFile `
             -Name "Thai Coder" -Description "CI test" -HomeOverride $tmpHome | Out-Null
 
-        $dest = Join-Path $tmpHome '.agent-presets\thai-coder'
+        $dest = Join-Path $tmpHome '.agent-presets' 'thai-coder'
         $comp = Join-Path $dest 'agent.cordis.yml'
         Assert (Test-Path $comp) "agent.cordis.yml not written at $dest"
         $raw = Get-Content $comp -Raw -Encoding UTF8
