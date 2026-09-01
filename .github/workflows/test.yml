@@ -1,0 +1,24 @@
+name: test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  windows:
+    name: PowerShell (Windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run install.ps1 self-test
+        shell: pwsh
+        run: ./test-install.ps1
+
+  ubuntu:
+    name: PowerShell (Ubuntu)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run install.ps1 self-test
+        shell: pwsh
+        run: ./test-install.ps1

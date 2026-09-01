@@ -31,7 +31,8 @@ param(
     [string]$Name,
     [string]$Description,
     [switch]$Default,
-    [string]$HomeOverride
+    [string]$HomeOverride,
+    [string]$BaseDir
 )
 
 Set-StrictMode -Version Latest
@@ -72,16 +73,29 @@ function Find-ShippedRoot {
     return $null
 }
 $script:ShippedRoot = Find-ShippedRoot
-if (-not $script:ShippedRoot) { throw "Could not locate the DSH install (config\agent-presets). Is 'dsh' on PATH?" }
 
 # ── validation ───────────────────────────────────────────────────────────────
 
 if ($Id -notmatch '^[a-z0-9][a-z0-9-]*$') { throw "invalid preset id '$Id' (must match [a-z0-9][a-z0-9-]*)" }
 
-$sourceDir = Join-Path $script:ShippedRoot $From
-if (-not (Test-Path (Join-Path $sourceDir 'agent.cordis.yml'))) {
-    throw "base preset '$From' not found under shipped root (looked at $sourceDir)"
+# Base directory: an explicit -BaseDir override (test seam / automation) or the
+# shipped base resolved from -From. -BaseDir lets CI run the real installer
+# against a synthetic base without a DSH install on PATH.
+if ($BaseDir) {
+    $sourceDir = [IO.Path]::GetFullPath($BaseDir)
+    if (-not (Test-Path (Join-Path $sourceDir 'agent.cordis.yml'))) {
+        throw "base dir has no agent.cordis.yml: $sourceDir"
+    }
+} else {
+    if (-not $script:ShippedRoot) {
+        throw "Could not locate the DSH install (config\agent-presets). Is 'dsh' on PATH? Use -BaseDir to point at a preset directory explicitly."
+    }
+    $sourceDir = Join-Path $script:ShippedRoot $From
+    if (-not (Test-Path (Join-Path $sourceDir 'agent.cordis.yml'))) {
+        throw "base preset '$From' not found under shipped root (looked at $sourceDir)"
+    }
 }
+$baseLabel = if ($BaseDir) { (Split-Path $sourceDir -Leaf) } else { $From }
 
 $dest = Join-Path $script:UserRoot $Id
 if (Test-Path $dest) {
@@ -106,7 +120,7 @@ $compPath = Join-Path $dest 'agent.cordis.yml'
 $text = Get-Content $compPath -Raw -Encoding UTF8
 $pattern = '(?m)^- id:\s*persona\b(?s:.)*?(?=^- |\z)'
 $block = [regex]::Match($text, $pattern).Value
-if (-not $block) { Remove-Item $dest -Recurse -Force; throw "base preset '$From' has no '- id: persona' row" }
+if (-not $block) { Remove-Item $dest -Recurse -Force; throw "base preset '$baseLabel' has no '- id: persona' row" }
 
 $extraKeys = [regex]::Matches($block, '(?m)^\s{4}(?!text:)([A-Za-z][\w-]*):(?:\s+(\S.*))?$') |
     Where-Object { $_.Groups[1].Value -notin @('name', 'text') }
@@ -141,7 +155,7 @@ if ($metaLines.Count -gt 0) {
 }
 
 Write-Host "installed preset '$Id' at $dest" -ForegroundColor Green
-Write-Host "  base     : $($From) (shipped)" -ForegroundColor DarkGray
+Write-Host "  base     : $baseLabel" -ForegroundColor DarkGray
 Write-Host "  persona  : $($personaPath)" -ForegroundColor DarkGray
 if ($Name) { Write-Host "  name     : $Name" -ForegroundColor DarkGray }
 

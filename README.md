@@ -6,6 +6,20 @@
 
 ---
 
+## สถานะ CI
+
+[![test](https://github.com/Manchinn/agent-preset-templates/actions/workflows/test.yml/badge.svg)](https://github.com/Manchinn/agent-preset-templates/actions/workflows/test.yml)
+
+แก้โค้ดแล้วไม่แน่ใจว่ายังรันได้? รัน self-test ที่เครื่อง:
+
+```powershell
+pwsh ./test-install.ps1     # exit 0 = OK
+```
+
+สคริปต์นี้ทดสอบ `install.ps1` จริงบน base preset สังเคราะห์ (ไม่ต้องมี DSH ติดตั้ง) — เช็คว่า persona ถูกแทนค่า, `{{model}}`/`{{cwd}}` คงอยู่, row ข้างเคียงไม่หลุด, `preset.yml` ถูกเขียน และ `-Default` อัปเดต `settings.yaml` GitHub Actions รันให้อัตโนมัติทั้ง Windows และ Ubuntu ทุก push / PR
+
+---
+
 ## วิธีติดตั้ง (clone → รันสคริปต์เดียว)
 
 ```powershell
