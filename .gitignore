@@ -1,0 +1,16 @@
+# local DSH state — never commit these (real machine paths, settings, backups)
+.dsh/
+*.bak
+*.bak-presets
+settings.yaml
+settings.yaml.bak*
+
+# temp / editor
+*.tmp
+Thumbs.db
+.DS_Store
+.vscode/
+.idea/
+
+# PowerShell profile leftovers if any were dumped here
+*.ps1.bak
