@@ -31,7 +31,7 @@ function Assert([bool]$Condition, [string]$Message) {
 
 $fail = 0
 try {
-    $tmp = Join-Path $env:TEMP ('dsh-preset-test-' + [guid]::NewGuid().ToString('N'))
+    $tmp = Join-Path ([IO.Path]::GetTempPath()) ('dsh-preset-test-' + [guid]::NewGuid().ToString('N'))
     try {
         # ── synthetic base preset (same row shape as `standard`) ────────────
         $base = Join-Path $tmp 'base' 'standard'
