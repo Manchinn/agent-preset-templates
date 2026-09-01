@@ -43,7 +43,10 @@ $ErrorActionPreference = 'Stop'
 function Resolve-DshHome {
     if ($HomeOverride) { return [IO.Path]::GetFullPath($HomeOverride) }
     if ($env:DSH_HOME -and $env:DSH_HOME.Trim()) { return [IO.Path]::GetFullPath($env:DSH_HOME) }
-    return Join-Path ([Environment]::GetFolderPath('UserProfile')) '.dsh'
+    # UserProfile can be empty on some Linux runners; fall back to $HOME.
+    $profile = [Environment]::GetFolderPath('UserProfile')
+    if (-not $profile) { $profile = $env:HOME }
+    return Join-Path $profile '.dsh'
 }
 $script:DshHome = Resolve-DshHome
 $script:UserRoot = Join-Path $script:DshHome '.agent-presets'
